@@ -47,18 +47,20 @@ You are tasked with creating a simple web application that allows users to manag
 - Include instructions on how to set up and run the application locally.
 - Describe the database schema and API endpoints.
 - Include any additional information that may be useful for someone reviewing or using your code.
+
 5. **Extra Points (Optional):**
+   
 - Implement user authentication for adding, editing, and deleting tasks.
 - Implement sorting or filtering options for the task list.
 - Implement the ability to link tasks into groups or categories.
 
-5. **Guidelines:**
+6. **Guidelines:**
 
 - You have the creative freedom to choose the specific technologies and libraries you use for this task.
 - You are encouraged to use best practices for code structure, readability, and maintainability.
 - If you encounter any challenges or limitations, feel free to document them in your code and suggest possible solutions.
 
-6. **Submission:**
+7. **Submission:**
 
 - To submit your work, please follow these steps:
 
@@ -77,7 +79,7 @@ You are tasked with creating a simple web application that allows users to manag
   - Any challenges you encountered and how you overcame them.
   - If applicable, any additional features or improvements you added beyond the basic requirements.
 
-7. **Submission Deadline:**
+8. **Submission Deadline:**
 
 You have the flexibility to choose your own deadline to submit the assignment. Please ensure that you submit your Pull Request (PR) before your self-selected deadline. Your submission will be evaluated based on code quality, functionality, adherence to requirements, and any extra points implemented.
 
