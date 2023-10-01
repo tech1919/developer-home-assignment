@@ -1,123 +1,119 @@
-from flask import Flask, request
-from mysql.connector import connection
+from flask import Flask, request, jsonify
+from db import Database
+from model import Task
+import mysql.connector
 
-# from  myconnection import
+app = Flask(__name__)
+db_pool = Database(pool_size=5)
+db_pool.create_table_if_not_exists()
 
-app = Flask("__name_")
+# Helper function to handle database errors
+def handle_database_error(error_message):
+    return jsonify({"error": error_message}), 500
 
+# GET /tasks
+@app.route('/', methods=['GET'])
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    try:
+        connection = db_pool.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM tasks")
+        tasks = cursor.fetchall()
+        cursor.close()
+        connection.close()
 
-@app.route("/")
-def index():
-    cnx = connection.MySQLConnection(
-        user="root", password="pwd", host="127.0.0.1", database="myDB"
-    )
-    print("connected")
-    cnx.close()
+        task_list = []
+        for task in tasks:
+            task_data = Task(*task[1:]).as_dict()
+            task_data["id"] = task[0]
+            task_list.append(task_data)
+            
+        return jsonify(task_list)
+    except mysql.connector.Error as e:
+        return handle_database_error(str(e))
 
-    return "<h1>connected</h1>"
-
-
-# Retrieve a list of all tasks
-@app.route("/tasks", methods=["GET"])
-def home():
-    cnx = connection.MySQLConnection(
-        user="root", password="pwd", host="127.0.0.1", database="myDB"
-    )
-    cursor = cnx.cursor()
-    query = "SELECT * FROM tasks"
-    cursor.execute(query)
-
-    results = cursor.fetchall()
-
-    print(results)
-    cursor.close()
-    cnx.close()
-    return f"<h1>{results}</h1>"
-
-
-# Retrieve details of a specific task by its ID
-@app.route("/tasks/<id>", methods=["GET"])
+# GET /tasks/{id}
+@app.route('/tasks/<int:id>', methods=['GET'])
 def get_task(id):
-    cnx = connection.MySQLConnection(
-        user="root", password="pwd", host="127.0.0.1", database="myDB"
-    )
-    cursor = cnx.cursor()
-    query = f"SELECT * FROM tasks WHERE id ={id}"
-    cursor.execute(query)
-    results = cursor.fetchall()
-    print(results)
-    cursor.close()
-    cnx.close()
+    try:
+        connection = db_pool.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM tasks WHERE id=%s", (id,))
+        task = cursor.fetchone()
+        cursor.close()
+        connection.close()
 
-    return f"<h1>{results}</h1>"
+        if task:
+            task_data = Task(*task[1:]).as_dict()
+            task_data["id"] = task[0]
+            return jsonify(task_data)
+        else:
+            return jsonify({"message": "Task not found"}), 404
+    except mysql.connector.Error as e:
+        return handle_database_error(str(e))
 
-# Create a new task
-@app.route("/tasks", methods=["POST"])
+# POST /tasks
+@app.route('/tasks', methods=['POST'])
 def create_task():
-    title = request.json["task"]
-    description = request.json["description"]
-    completed = request.json["completed"]
-    print("task", title, description, completed)
-    cnx = connection.MySQLConnection(
-        user="root", password="pwd", host="127.0.0.1", database="myDB"
-    )
-    cursor = cnx.cursor()
-    query = f"INSERT INTO tasks (title, description, completed) VALUES ('{title}', '{description}', {completed});"
+    try:
+        data = request.get_json()
+        new_task = Task(data["title"], data["description"], data["completed"])
 
-    cursor.execute(query)
-    cnx.commit()
-    cursor.close()
-    cnx.close()
+        connection = db_pool.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO tasks (title, description, completed) VALUES (%s, %s, %s)",
+                       (new_task.title, new_task.description, new_task.completed))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Task created successfully"}), 201
+    except mysql.connector.Error as e:
+        return handle_database_error(str(e))
 
-    return "new record added!"
-
-#Update an existing task by its ID
-@app.route("/tasks/<id>", methods=["PUT"])
+# PUT /tasks/{id}
+@app.route('/tasks/<int:id>', methods=['PUT'])
 def update_task(id):
-    task = request.get_json()
-    update_query=''
-    for key in task:
-        if isinstance(task[key],bool): 
-            update_query += f"{key} = {task[key]}, "
-        else:    
-            update_query += f"{key} = '{task[key]}', "
-    update_query = update_query.rstrip(', ')
+    try:
+        data = request.get_json()
 
-    print(update_query)
+        connection = db_pool.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM tasks WHERE id=%s", (id,))
+        existing_task = cursor.fetchone()
 
-    
-    cnx = connection.MySQLConnection(user='root', password='pwd',
-        host='127.0.0.1',
-        database='myDB')
-    cursor=cnx.cursor()
-    query =f"UPDATE tasks SET {update_query} WHERE id = {id}"
-    print(query)
-    cursor.execute(query)
-    cnx.commit()
+        if existing_task:
+            updated_task = Task(data["title"], data["description"], data["completed"])
+            cursor.execute("UPDATE tasks SET title=%s, description=%s, completed=%s WHERE id=%s",
+                           (updated_task.title, updated_task.description, updated_task.completed, id))
+            connection.commit()
+            cursor.close()
+            connection.close()
+            return jsonify({"message": "Task updated successfully"})
+        else:
+            return jsonify({"message": "Task not found"}), 404
+    except mysql.connector.Error as e:
+        return handle_database_error(str(e))
 
-    new_record = cursor.fetchone()
-    print(new_record)
-
-    cursor.close()
-    cnx.close()
-    return f"{id} updated!!!"
-
-#Delete a task by its ID
-@app.route("/tasks/<id>", methods=["DELETE"])
+# DELETE /tasks/{id}
+@app.route('/tasks/<int:id>', methods=['DELETE'])
 def delete_task(id):
-    cnx = connection.MySQLConnection(
-        user="root", password="pwd", host="127.0.0.1", database="myDB"
-    )
-    cursor = cnx.cursor()
-    query = f"DELETE FROM tasks WHERE id ={id}"
-    cursor.execute(query)
-    cnx.commit()
+    try:
+        connection = db_pool.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM tasks WHERE id=%s", (id,))
+        existing_task = cursor.fetchone()
 
-    cursor.close()
-    cnx.close()
-    
-    return f"task {id} deleted!!!"
+        if existing_task:
+            cursor.execute("DELETE FROM tasks WHERE id=%s", (id,))
+            connection.commit()
+            cursor.close()
+            connection.close()
+            return jsonify({"message": "Task deleted successfully"})
+        else:
+            return jsonify({"message": "Task not found"}), 404
+    except mysql.connector.Error as e:
+        return handle_database_error(str(e))
 
-
-if "__name__" == "__main__":
-    app.run(host="0.0.0.0")
+if __name__ == '__main__':
+    app.run(debug=True)
