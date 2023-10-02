@@ -1,88 +1,154 @@
-# Developer Home Assignment
 
-Homework for a programmer position at Tech-19
+# Task Management Web Application
 
-## **Developer Test: Building a Database, API, and Frontend Application**
+  
 
-> ### Task Overview:
+## Overview
 
-You are tasked with creating a simple web application that allows users to manage a list of tasks. This application should consist of three main components: a database to store task data, an API to interact with the database, and a basic frontend application to provide a user interface.
+This web application allows users to manage a list of tasks. It comprises three main components: a Flask API, a React frontend and a PostgreSQL database.
 
-> ### Requirements:
 
-1. **Database:**
-   
-- Use any SQL database of your choice (e.g., PostgreSQL, MySQL).
-- Create a table named `tasks` with the following columns:
-  - id (integer, primary key)
-  - title (string)
-  - description (text)
-  - completed (boolean)
 
-2. **API:**
-   
-- Build a Python-based API using a framework of your choice (e.g., Flask, Django, FastAPI).
-- The API should have the following endpoints:
-  - GET /tasks: Retrieve a list of all tasks.
-  - GET /tasks/{id}: Retrieve details of a specific task by its ID.
-  - POST /tasks: Create a new task.
-  - PUT /tasks/{id}: Update an existing task by its ID.
-  - DELETE /tasks/{id}: Delete a task by its ID.
+## Installation
 
-- Ensure proper error handling and return appropriate status codes.
+1.  **Prerequisites**:
 
-3. **Frontend:**
-   
-- Use any frontend framework or library of your choice (e.g., React, Angular, Vue.js).
-- Create a user interface that allows users to:
-  - View a list of tasks.
-  - Add a new task.
-  - Edit an existing task (including marking it as completed).
-  - Delete a task.
-- Make API calls to interact with the backend.
+- Python (version 3.11.5)
+-  PostgreSQL
+- Node.js (version 14.18+)
 
-4. **Documentation:**
-   
-- Provide clear and concise documentation for your code.
-- Include instructions on how to set up and run the application locally.
-- Describe the database schema and API endpoints.
-- Include any additional information that may be useful for someone reviewing or using your code.
+2.  **Setup Steps**:
 
-5. **Extra Points (Optional):**
-   
-- Implement user authentication for adding, editing, and deleting tasks.
-- Implement sorting or filtering options for the task list.
-- Implement the ability to link tasks into groups or categories.
+- Clone the repository: `git clone https://github.com/Nahums0/developer-home-assignment.git`
 
-6. **Guidelines:**
+- Navigate to the directory: `cd developer-home-assignment`
 
-- You have the creative freedom to choose the specific technologies and libraries you use for this task.
-- You are encouraged to use best practices for code structure, readability, and maintainability.
-- If you encounter any challenges or limitations, feel free to document them in your code and suggest possible solutions.
+- Install Python dependencies: `pip install -r backend/requirements.txt`
 
-7. **Submission:**
+- Install Node dependencies: `cd frontend && npm install`
 
-- To submit your work, please follow these steps:
+- Insert you database's uri string in the backend/.env file `DATABASE_URI={your db url}`
 
-  1. Fork the provided repository.
-  2. Create a new branch in your fork for this task. You can name it something descriptive like `task-solution`.
-  3. Make your changes on this branch, following the requirements and guidelines provided in the task.
-  4. Ensure that your code is well-documented and adheres to best practices.
-  5. Test your application locally to verify that it functions as expected.
-  6. Commit your changes to the branch with clear and concise commit messages.
-  7. Once you are satisfied with your solution, push the branch to your forked repository.
-  8. Open a Pull Request (PR) from your `task-solution` branch to the main branch of the original repository.
+1. **Starting the services**
+> Run commands from root directory
+> 
+- Running the backend: `cd backend && python run.py`
+- Running the frontend: `cd frontend && npm run dev`
 
-- In your PR description, please include:
+1.  **Access the App**:
 
-  - A brief summary of the changes you made.
-  - Any challenges you encountered and how you overcame them.
-  - If applicable, any additional features or improvements you added beyond the basic requirements.
+- Visit `http://localhost:5173`
 
-8. **Submission Deadline:**
+  
 
-You have the flexibility to choose your own deadline to submit the assignment. Please ensure that you submit your Pull Request (PR) before your self-selected deadline. Your submission will be evaluated based on code quality, functionality, adherence to requirements, and any extra points implemented.
+## Database Schema
 
-<hr>
+ 
 
-If you have any questions or need further assistance, feel free to reach out. Good luck!
+### `tasks` Table
+
+-  `id`: integer, Primary Key
+- `owner`: integer, Foreign Key (task.owner <--> user.email)
+-  `title`: string
+-  `description`: String
+-  `completed`: boolean
+- `group_id`: integer, Foreign Key (task.group_id <--> group.id)
+  
+### `User` Table
+
+-   `email`:  string, Primary Key
+-   `password`: binary
+
+### `Group` Table
+
+-   `id`: integer, Primary Key
+-   `owner`: string, Foreign Key (group.owner <--> user.email)
+-   `title`: string 
+-   `color`: string 
+
+
+## API Endpoints
+
+### `app/routes/users.py`:
+
+-   **User Login**:
+    
+    -   Method: POST
+    -   Endpoint: `/api/login`
+    -   Description: Authenticates users based on their email and password. If the credentials are valid, an access token is returned.
+-   **User Registration**:
+    
+    -   Method: POST
+    -   Endpoint: `/api/register`
+    -   Description: Registers new users, stores their email and a hashed version of their password. Returns an JWT access token upon successful registration.
+
+### `app/routes/tasks.py`:
+
+-   **Retrieve All Tasks for a User**:
+    
+    -   Method: GET
+    -   Endpoint: `/api/`
+    -   Description: Retrieves all tasks belonging to the authenticated user with custom sorting
+-   **Retrieve a Specific Task by ID**:
+    
+    -   Method: GET
+    -   Endpoint: `/api/<int:task_id>`
+    -   Description: Retrieves a specific task belonging to the authenticated user
+
+-   **Retrieve Tasks by Group ID**:
+    
+    -   Method: GET
+    -   Endpoint: `/api/group/<int:group_id>`
+    -   Description: Retrieves all tasks belonging to the authenticated user that have a specific group ID
+-   **Retrieve Sorted Tasks**:
+    
+    -   Method: GET
+    -   Endpoint: `/api/sort/<string:sort_by>`
+    -   Description: Retrieves tasks sorted by the specified field for the authenticated user (title, description and completed)
+-   **Create a New Task**:
+    
+    -   Method: POST
+    -   Endpoint: `/api/`
+    -   Description: Creates a new task for the authenticated user based on the provided title, description, and optional group ID
+-   **Update an Existing Task**:
+    
+    -   Method: PUT
+    -   Endpoint: `/api/<int:task_id>`
+    -   Description: Updates given fields of an existing task 
+-   **Delete a Task**:
+    
+    -   Method: DELETE
+    -   Endpoint: `/api/<int:task_id>`
+    -   Description: Deletes a specific task based on its ID, if the task belongs to the authenticated user
+### `app/routes/groups.py`:
+
+-   **Retrieve All Groups for a User**:
+    
+    -   Method: GET
+    -   Endpoint: `/api/`
+    -   Description: Retrieves all groups belonging to the authenticated user
+-   **Create a New Group**:
+    
+    -   Method: POST
+    -   Endpoint: `/api/`
+    -   Description: Creates a new group for the user with a specified title
+
+## Frontend Interface
+Built with React, the frontend allows users to:
+
+- Login / Register while caching the access_token as a session variable 
+- View all tasks
+- Add new tasks
+- Sort tasks by title and is completed (ascending, descending)
+- Edit task's title, description, selected and completion status
+- Delete tasks
+- Create groups
+- Delete groups  
+
+## Extras
+1. The backend uses JWT for user authentication, requiring authentication to all endpoint related to user's data
+2. The backend uses sqlalchemy for object relation mapping and alembic for database migrations
+3. The backend an .env file to allow easily changeable settings
+4. The frontend allows users to use server side sorting to sort his task by multiple fields
+5. The fronted allows users to group tasks by color coded groups they created
+6. The frontend was fully tested for functionality ensuring no bugs or unwanted behavior occurs 
