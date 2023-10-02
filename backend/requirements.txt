@@ -1,0 +1,8 @@
+flask
+flask_sqlalchemy
+alembic
+python-dotenv
+flask_wtf
+wtforms
+flask_jwt_extended
+bcrypt

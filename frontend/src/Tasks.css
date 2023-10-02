@@ -1,0 +1,39 @@
+.todo-page{
+    min-height: 100vh;
+     
+}
+
+.list-group-item input[type="checkbox"] {
+    margin: 0 10px 0 0;
+}
+
+.badge {
+    padding: 5px;
+}
+.badge::selection {
+    background: transparent;
+}
+.badge:hover {
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+.badge-selected{
+    border-radius: 10px;
+}
+.task-button {
+    margin-top: 4rem;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.open-button{
+    margin-right: 5px;
+}
+.sort-container{
+    margin-top: 10px;
+    width:fit-content
+}
