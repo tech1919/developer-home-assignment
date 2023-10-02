@@ -1,11 +1,12 @@
+import os
 from flask import Flask, request, jsonify
 from db import Database
 from model import Task
 import mysql.connector
-
 app = Flask(__name__)
 db_pool = Database(pool_size=5)
 db_pool.create_table_if_not_exists()
+import config
 
 # Helper function to handle database errors
 def handle_database_error(error_message):

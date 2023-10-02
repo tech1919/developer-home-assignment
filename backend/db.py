@@ -1,6 +1,7 @@
 import mysql.connector
 import mysql.connector.pooling
 import time
+from config import CONNECT_TIMEOUT, DB_HOST, DB_NAME, DB_PASSWD, DB_USER  
 
 class Database:
     def __init__(self, pool_size, max_retries=3, retry_delay=1):
@@ -10,10 +11,12 @@ class Database:
 
         self.connection_pool = mysql.connector.pooling.MySQLConnectionPool(
             pool_size=pool_size,
-            host="localhost",
-            user="root",
-            password="pwd",
-            database="myDB"
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWD,
+            database=DB_NAME,
+            connect_timeout=CONNECT_TIMEOUT
+
         )
 
         self.retries = 0
