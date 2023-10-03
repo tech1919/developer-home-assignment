@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: 
+     context: ./backend
+     dockerfile: ./backend/Dockerfile
+    env_file:
+      - ./backend/.env
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ''
+      DB_NAME: api
+      
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+  db:
+    image: bitnami/mysql:latest
+    environment:
+      MYSQL_DATABASE: api
+      ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+     - '3306:3306'
+    
