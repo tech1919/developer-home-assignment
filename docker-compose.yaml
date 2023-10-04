@@ -1,8 +1,7 @@
 services:
   backend:
     build: 
-     context: .
-     dockerfile: ./backend/Dockerfile
+     context: ./backend
     environment:
       DB_HOST: db
       DB_PORT: 3306
@@ -16,12 +15,20 @@ services:
     ports:
       - '8080:8080'
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   db:
-    image: bitnami/mysql:latest
-    environment:
-      MYSQL_DATABASE: api
-      ALLOW_EMPTY_PASSWORD: 'yes'
+    image: docker.io/bitnami/mysql:latest
     ports:
-     - '3306:3306'
-    
+      - '3306:3306'
+    # volumes:
+    #   - 'mysql_data:/bitnami/mysql/data'
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      MYSQL_DATABASE: api
+      ALLOW_EMPTY_PASSWORD: yes
+    healthcheck:
+      test: ['CMD', '/opt/bitnami/scripts/mysql/healthcheck.sh']
+      interval: 15s
+      timeout: 5s
+      retries: 6

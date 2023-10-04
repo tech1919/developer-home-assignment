@@ -1,9 +1,5 @@
-## To run the project run the following commands:
-$ 'cd backend'
-$ 'docker build -t myfastapi .'
-## After the build will finish run:
-$ 'cd ..'
+## To run the backend project, run the following commands:
 $ 'docker compose up'
 
-# to run the frontend you should install npm and run:
+## To run the frontend you should install npm and run:
 $ 'npm start'
