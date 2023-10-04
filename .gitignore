@@ -1,7 +1,5 @@
-backend/__pycache__
-backend/.idea
-backend/.venv
-backend/ myconnection.py
-backend/cpy-errors.log
-commands.txt
 .vscode
+.idea
+backend/__pycache__
+backend/.venv
+backend/.env
