@@ -1,0 +1,34 @@
+body{
+    font-family: sans-serif;
+    margin: 0 auto;
+    padding: 25px;
+    max-width: 400px;
+    min-width: 400px;
+    background-color: white;
+    text-align: center;
+}
+
+.card{
+    border-radius: 25px;
+    position: relative;
+    padding: 25px 15px;
+    background-color: #81ecec;
+    margin: 50px 0;
+    height: 200px;
+    box-shadow: 0 2px 5px #ccc;
+    text-align: left;
+}
+
+.title{
+    font-size: 2em;
+    color: black;
+    display: flex;
+    flex: 1;
+    margin: 10% 20px 0;
+}
+
+.button{
+    padding: 12px;
+    
+    text-align: right;
+}
