@@ -1,6 +1,5 @@
 import mysql.connector
 import mysql.connector.pooling
-import time
 from config import config
 
 class Database:
@@ -16,9 +15,7 @@ class Database:
             password=config.DB_PASSWD,
             database=config.DB_NAME,
             connect_timeout=config.CONNECT_TIMEOUT
-
         )
-
         self.retries = 0
 
     def get_connection(self):
